@@ -1,5 +1,5 @@
 function Particle() {
-  this.pos = createVector(random(width), random(height));
+  this.pos = createVector(random(tex.width), random(tex.height));
   this.vel = createVector(0, 0);
   this.acc = createVector(0, 0);
   this.maxspeed = 1;
@@ -27,9 +27,9 @@ function Particle() {
   }
 
   this.show = function() {
-    stroke(0, 3);
-    strokeWeight(1);
-    line(this.pos.x, this.pos.y, this.prevPos.x, this.prevPos.y);
+    tex.stroke(0, 3);
+    tex.strokeWeight(1);
+    tex.line(this.pos.x, this.pos.y, this.prevPos.x, this.prevPos.y);
     //point(this.pos.x, this.pos.y);
     this.updatePrev();
   }
@@ -39,20 +39,20 @@ function Particle() {
     this.prevPos.y = this.pos.y;
   }
   this.edges = function() {
-    if (this.pos.x > width) {
+    if (this.pos.x > tex.width) {
       this.pos.x = 0;
       this.updatePrev();
     }
     if (this.pos.x < 0) {
-      this.pos.x = width;
+      this.pos.x = tex.width;
       this.updatePrev();
     }
-    if (this.pos.y > height) {
+    if (this.pos.y > tex.height) {
       this.pos.y = 0;
       this.updatePrev();
     }
     if (this.pos.y < 0) {
-      this.pos.y = height;
+      this.pos.y = tex.height;
       this.updatePrev();
     }
   }

@@ -1,6 +1,7 @@
 let buffer = [];
 let serial;
 let portName = 'COM3'
+let macPort = '/dev/tty.usbmodem132908801'
 let bufferLength
 let tilesX, tilesY, matrixWidth, matrixHeight, numChannels
 
@@ -17,9 +18,13 @@ let particles = [];
 
 let flowField = [];
 
+let tex;
+
 function setup() {
-  createCanvas(64, 64);
-  background(0)
+  pixelDensity(1);
+  createCanvas(640, 640);
+  tex = createGraphics(64,64);
+  //tex.background(0)
   tilesX = 1;
   tilesY = 1;
   matrixHeight = 64;
@@ -28,7 +33,6 @@ function setup() {
   bufferLength = tilesX * matrixWidth * tilesY * matrixHeight * numChannels;
   // Assuming tex is a loaded image
   // You may replace this with your own image loading code
-  let tex = loadImage('t.jpg');
   serial = new p5.SerialPort();       // make a new instance of the serialport library
   serial.on('list', printList);  // set a callback function for the serialport list event
   serial.on('connected', serverConnected); // callback for connecting to the server
@@ -38,19 +42,18 @@ function setup() {
   serial.on('close', portClose);      // callback for the port closing
  
   serial.list();                      // list the serial ports
-  serial.open(portName);              // open a serial port
+  serial.open(macPort);              // open a serial port
   zoff = 0;
   scl = 10;
   inc = 0.1;
-  cols = floor(width / scl);
-  rows = floor(height / scl);
-  fr = createP();
+  cols = floor(tex.width / scl);
+  rows = floor(tex.height / scl);
 
-  for (let i = 0; i < 250; i++) {
-    particles[i] = new Particle();
+  for (let i = 0; i < 200; i++) {
+    particles[i] = new Particle(tex);
   }
   
-  background(220);
+  tex.background(220);
 }
 
 function draw() {
@@ -75,25 +78,58 @@ function draw() {
   for (let i = 0; i < particles.length; i++) {
     particles[i].update();
     particles[i].edges();
-    particles[i].show();    
+    particles[i].show(tex);    
     particles[i].follow(flowField);
   }
 
-  loadPixels();
+
+  tex.loadPixels();
+  background(80);
+  let previewSize =10 
+  let ox = 20;
+  let oy = 160;
+  fill(0);
+  noStroke();
+  //rect(ox, oy, tex.width * previewSize, tex.height * previewSize);  
+  /*let idx = 0;
+  for(let i = 0; i < tex.height; i++) {
+    for(let j = 0; j < tex.width; j++) {
+      let r = tex.pixels[idx]
+      idx++;
+      let g = tex.pixels[idx]
+      idx++
+      let b = tex.pixels[idx]
+      idx++
+      idx++ 
+      fill(r,g,b);
+      let x = i * previewSize
+      let y = j * previewSize
+      rect(x, y, previewSize-1, previewSize-1);
+    }
+  }*/
+
+
   let idx = 0;
   let id = 0
-  for(let x = 0; x < matrixHeight; x++) {
-    for(let y = 0; y < matrixWidth; y++) {
-      buffer[id] = pixels[idx]
+  for(let i = 0; i < matrixHeight; i++) {
+    for(let j = 0; j < matrixWidth; j++) {
+      buffer[id] = tex.pixels[idx]
+      let r = tex.pixels[idx]
       id++;
       idx++;
-      buffer[id] = pixels[idx]
+      buffer[id] = tex.pixels[idx]
+      let g = tex.pixels[idx]
       id++;
       idx++
-      buffer[id] = pixels[idx]
+      buffer[id] = tex.pixels[idx]
+      let b = tex.pixels[idx]
       id++;
       idx++
       idx++
+      fill(r,g,b);
+      let y = i * previewSize
+      let x = j * previewSize
+      rect(x, y, previewSize-1, previewSize-1);
     }
 
   }
